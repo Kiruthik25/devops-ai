@@ -10,7 +10,12 @@ dotenv.config();
 const app = express();
 const PORT: number = Number(process.env.GATEWAY_PORT) || 3001;
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: false,
+    originAgentCluster: false,
+  })
+);
 app.use(cors());
 
 setupMetrics(app, { serviceName: 'gateway', serviceVersion: '1.0.0' });
@@ -18,10 +23,10 @@ setupMetrics(app, { serviceName: 'gateway', serviceVersion: '1.0.0' });
 app.use(metricsMiddleware);
 
 const services = {
-  auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3002',
-  products: process.env.PRODUCTS_SERVICE_URL || 'http://localhost:3003',
-  orders: process.env.ORDERS_SERVICE_URL || 'http://localhost:3004',
-  users: process.env.USERS_SERVICE_URL || 'http://localhost:3005',
+  auth: process.env.AUTH_SERVICE_URL || 'http://product-service:3002',
+  products: process.env.PRODUCTS_SERVICE_URL || 'http://auth-service:3003',
+  orders: process.env.ORDERS_SERVICE_URL || 'http://orders-service:3004',
+  users: process.env.USERS_SERVICE_URL || 'http://users-service:3005',
 };
 
 app.use('/api/auth', createProxyMiddleware({
